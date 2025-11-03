@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - HSK Shopping</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .contact-section {
+      background: white;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .contact-section h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .contact-card {
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .contact-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .contact-card p {
+      margin: 0.75rem 0;
+      font-size: 1.1rem;
+    }
+
+    .contact-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      margin-left: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin: 1rem 0;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border-left: 4px solid #2196F3;
+    }
+
+    @media print {
+      .header, .btn, .back-link, .contact-form {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Contact Us</h1>
+    <p>We're here to help. Get in touch with us!</p>
+  </div>
+
+  <div class="container">
+    <a href="/" class="back-link">← Back to Home</a>
+
+    <div class="contact-section">
+      <h2>Get in Touch</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>📧 Email</h3>
+          <p><strong>General Inquiries:</strong><br>
+          <span id="contact-email">contact@hsk-shopping.com</span></p>
+          <p><strong>Support:</strong><br>
+          support@hsk-shopping.com</p>
+        </div>
+        <div class="contact-card">
+          <h3>📞 Phone</h3>
+          <p><strong>Toll Free:</strong><br>
+          <span id="contact-phone">1-800-HSK-SHOP</span></p>
+          <p><strong>Direct Line:</strong><br>
+          +1-800-475-7467</p>
+        </div>
+        <div class="contact-card">
+          <h3>📍 Address</h3>
+          <p><strong>Head Office:</strong><br>
+          HSK Shopping Platform<br>
+          Bangalore, Karnataka, India<br>
+          Pin: 560001</p>
+        </div>
+        <div class="contact-card">
+          <h3>🕐 Business Hours</h3>
+          <p><strong>Monday - Saturday:</strong><br>
+          9:00 AM - 8:00 PM</p>
+          <p><strong>Sunday:</strong><br>
+          10:00 AM - 6:00 PM</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-section">
+      <div class="contact-form">
+        <h2>Send us a Message</h2>
+        <form id="contactForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <label for="name">Your Name *</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Your Email *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone">
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject *</label>
+            <input type="text" id="subject" name="subject" required>
+          </div>
+          <div class="form-group">
+            <label for="message">Your Message *</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button type="submit" class="btn">Send Message</button>
+          <button type="button" onclick="window.print()" class="btn btn-secondary">Print Contact Info</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="contact-section">
+      <div class="info-box">
+        <h3 style="margin-bottom: 0.5rem;">Why Choose Us?</h3>
+        <p>At HSK Shopping, we believe in providing exceptional customer service. Our dedicated support team is available to assist you with any questions or concerns. We're committed to making your shopping experience as smooth and enjoyable as possible.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleSubmit(event) {
+      event.preventDefault();
+      alert('Thank you for your message! Our team will get back to you within 24 hours.');
+    }
+
+    function downloadAsPDF() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
+

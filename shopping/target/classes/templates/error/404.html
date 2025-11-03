@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not Found</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #f7f7f7; 
+      margin: 0; 
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container { 
+      max-width: 600px; 
+      margin: 20px auto; 
+      background: #fff; 
+      padding: 32px; 
+      border-radius: 8px; 
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
+      text-align: center; 
+      width: 90%;
+    }
+
+    h1 { 
+      margin-bottom: 12px; 
+      color: #333; 
+      font-size: 2rem;
+    }
+
+    p { 
+      color: #666; 
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+
+    a { 
+      display: inline-block; 
+      margin: 8px 10px; 
+      color: #007bff; 
+      text-decoration: none; 
+      padding: 10px 20px;
+      border: 2px solid #007bff;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 25px 20px;
+        margin: 15px auto;
+        max-width: 95%;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 1rem;
+        margin-bottom: 15px;
+      }
+
+      a {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin: 6px 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+        margin: 10px auto;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+      }
+
+      a {
+        padding: 6px 12px;
+        font-size: 13px;
+        margin: 4px 6px;
+        display: block;
+        width: 100%;
+        max-width: 200px;
+        margin: 4px auto;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .container {
+        padding: 15px 10px;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      p {
+        font-size: 0.85rem;
+      }
+
+      a {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
+  </head>
+<body>
+  <div class="container">
+    <h1>404 - Not Found</h1>
+    <p>The page you are looking for doesn’t exist.</p>
+    <a href="/">Go to Home</a>
+  </div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Developer Information</h3>
+      <div class="developer-info">
+        <p><strong>Adishesha R</strong></p>
+        <p>📍 Bangalore, Karnataka, India</p>
+        <p>📧 adishesha.r@g10xtech.com</p>
+        <p>🏢 G10X Technology Private Limited</p>
+      </div>
+    </div>
+    
+    <div class="footer-section">
+      <h3>Quick Links</h3>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Sign Up</a></li>
+        <li><a href="/seller-login">Seller Login</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-section">
+      <h3>Support</h3>
+      <ul class="footer-links">
+        <li><a href="/help-center">Help Center</a></li>
+        <li><a href="/contact-us">Contact Us</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+        <li><a href="/terms-of-service">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <p>&copy; 2024 HSK Shopping Platform. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Footer Styles */
+  .footer {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    margin-top: 50px;
+    padding: 0;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-section h3 {
+    color: #3498db;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+  }
+
+  .developer-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .developer-info p:first-child {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e74c3c;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-links li {
+    margin: 10px 0;
+  }
+
+  .footer-links a {
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 14px;
+  }
+
+  .footer-links a:hover {
+    color: #3498db;
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-top: 1px solid #34495e;
+  }
+
+  .footer-bottom-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .footer-bottom-content p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #95a5a6;
+  }
+
+  .footer-bottom-content p:last-child {
+    font-style: italic;
+    color: #7f8c8d;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 30px 15px;
+    }
+    
+    .footer-section h3 {
+      font-size: 16px;
+    }
+    
+    .developer-info p,
+    .footer-links a {
+      font-size: 13px;
+    }
+    
+    .footer-bottom-content p {
+      font-size: 12px;
+    }
+  }
+</style>
+
+</body>
+</html>
+
+
