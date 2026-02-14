@@ -122,8 +122,12 @@ public class CartController {
             session.setAttribute("cart", cart);
             logger.info("Cart updated successfully. Total items in cart: {}", cart.size());
             
+            // Calculate total items for feedback
+            int totalItems = cart.stream().mapToInt(CartItem::getQuantity).sum();
+            logger.info("Total quantity of items in cart: {}", totalItems);
+            
             logger.info("=== ADD TO CART REQUEST COMPLETED SUCCESSFULLY ===");
-            return "redirect:/";
+            return "redirect:/?cartAdded=true&productName=" + product.getName().replace(" ", "+");
         } catch (Exception e) {
             logger.error("=== ERROR IN ADD TO CART REQUEST for Product ID: {} ===", id, e);
             throw e;

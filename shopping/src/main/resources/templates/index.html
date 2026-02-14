@@ -1085,6 +1085,14 @@
 </div>
 
 <section class="products" id="products">
+  <!-- Cart Success/Error Messages -->
+  <div th:if="${cartSuccess}" style="background: #4caf50; color: white; padding: 15px; margin: 20px 0; border-radius: 5px; text-align: center;">
+    <strong>✓</strong> <span th:text="${cartSuccess}">Item added to cart!</span>
+  </div>
+  <div th:if="${cartError}" style="background: #f44336; color: white; padding: 15px; margin: 20px 0; border-radius: 5px; text-align: center;">
+    <strong>✗</strong> <span th:text="${cartError}">Error adding to cart!</span>
+  </div>
+  
   <h2 th:if="${searchKeyword != null}" th:text="'Search Results for: ' + ${searchKeyword}">Search Results</h2>
   <h2 th:if="${searchKeyword == null}">Our Products</h2>
   <div class="product-list">
