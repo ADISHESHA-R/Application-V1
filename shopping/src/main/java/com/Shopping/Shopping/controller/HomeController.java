@@ -54,11 +54,16 @@ public class HomeController {
             List<String> categories = productService.getAllCategories();
             model.addAttribute("categories", categories);
             
-            // Check for cart success message
-            String cartAdded = (String) session.getAttribute("cartAdded");
-            if (cartAdded != null) {
-                model.addAttribute("cartSuccess", "Item added to cart successfully!");
-                session.removeAttribute("cartAdded");
+            // Check for cart success/error messages
+            String cartSuccess = (String) session.getAttribute("cartSuccessMessage");
+            String cartError = (String) session.getAttribute("cartErrorMessage");
+            if (cartSuccess != null) {
+                model.addAttribute("cartSuccess", cartSuccess);
+                session.removeAttribute("cartSuccessMessage");
+            }
+            if (cartError != null) {
+                model.addAttribute("cartError", cartError);
+                session.removeAttribute("cartErrorMessage");
             }
             
             logger.info("=== HOME PAGE REQUEST COMPLETED SUCCESSFULLY ===");
