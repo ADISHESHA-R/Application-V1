@@ -89,9 +89,16 @@ public class AuthController {
             log.error("Failed to process user photo: {}", e.getMessage());
         }
 
-        userRepo.save(user);
-        log.info("User registered successfully: {}", username);
-        return "redirect:/login";
+        try {
+            userRepo.save(user);
+            log.info("User registered successfully: {}", username);
+            return "redirect:/login";
+        } catch (Exception e) {
+            log.error("Error saving user: {}", e.getMessage(), e);
+            model.addAttribute("error", "Registration failed. Please try again.");
+            model.addAttribute("user", new User());
+            return "signup";
+        }
     }
 
     // Seller Signup Form
@@ -139,9 +146,16 @@ public class AuthController {
             log.error("Failed to process seller photo: {}", e.getMessage());
         }
 
-        sellerRepo.save(seller);
-        log.info("Seller registered successfully: {}", username);
-        return "redirect:/seller-login";
+        try {
+            sellerRepo.save(seller);
+            log.info("Seller registered successfully: {}", username);
+            return "redirect:/seller-login";
+        } catch (Exception e) {
+            log.error("Error saving seller: {}", e.getMessage(), e);
+            model.addAttribute("error", "Registration failed. Please try again.");
+            model.addAttribute("seller", new Seller());
+            return "seller-signup";
+        }
     }
 
     // User Login Page
