@@ -95,6 +95,25 @@ public class AuthController {
             User savedUser = userRepo.saveAndFlush(user);
             log.info("User saved and flushed with ID: {}", savedUser.getId());
             
+            // VERIFICATION: Query database immediately to confirm data is saved
+            userRepo.flush(); // Force flush to database
+            var verifyUser = userRepo.findById(savedUser.getId());
+            if (verifyUser.isPresent()) {
+                log.info("✅ VERIFICATION SUCCESS: User found in database after save - ID: {}, Username: {}", 
+                    verifyUser.get().getId(), verifyUser.get().getUsername());
+            } else {
+                log.error("❌ VERIFICATION FAILED: User NOT found in database after save - ID: {}", savedUser.getId());
+            }
+            
+            // Also verify by username
+            var verifyByUsername = userRepo.findByUsername(username);
+            if (verifyByUsername.isPresent()) {
+                log.info("✅ VERIFICATION SUCCESS: User found by username in database - Username: {}, ID: {}", 
+                    username, verifyByUsername.get().getId());
+            } else {
+                log.error("❌ VERIFICATION FAILED: User NOT found by username in database - Username: {}", username);
+            }
+            
             log.info("User registered successfully: {} with ID: {}", username, savedUser.getId());
             log.info("User password encoded: {}", savedUser.getPassword() != null ? savedUser.getPassword().substring(0, Math.min(20, savedUser.getPassword().length())) + "..." : "null");
             
@@ -157,6 +176,26 @@ public class AuthController {
             // Use saveAndFlush to ensure immediate persistence
             Seller savedSeller = sellerRepo.saveAndFlush(seller);
             log.info("Seller saved and flushed with ID: {}", savedSeller.getId());
+            
+            // VERIFICATION: Query database immediately to confirm data is saved
+            sellerRepo.flush(); // Force flush to database
+            var verifySeller = sellerRepo.findById(savedSeller.getId());
+            if (verifySeller.isPresent()) {
+                log.info("✅ VERIFICATION SUCCESS: Seller found in database after save - ID: {}, Username: {}", 
+                    verifySeller.get().getId(), verifySeller.get().getUsername());
+            } else {
+                log.error("❌ VERIFICATION FAILED: Seller NOT found in database after save - ID: {}", savedSeller.getId());
+            }
+            
+            // Also verify by username
+            var verifyByUsername = sellerRepo.findByUsername(username);
+            if (verifyByUsername.isPresent()) {
+                log.info("✅ VERIFICATION SUCCESS: Seller found by username in database - Username: {}, ID: {}", 
+                    username, verifyByUsername.get().getId());
+            } else {
+                log.error("❌ VERIFICATION FAILED: Seller NOT found by username in database - Username: {}", username);
+            }
+            
             log.info("Seller registered successfully: {}", username);
             return "redirect:/seller-login";
         } catch (Exception e) {
