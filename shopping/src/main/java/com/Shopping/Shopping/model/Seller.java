@@ -3,6 +3,8 @@ package com.Shopping.Shopping.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Base64;
 
@@ -28,7 +30,7 @@ public class Seller {
     
     private String gstNumber;
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.BINARY)
     @Column(columnDefinition = "BYTEA")
     private byte[] photo;
 
