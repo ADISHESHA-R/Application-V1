@@ -82,7 +82,9 @@ public class AuthController {
         user.setAddress(address);
 
         try {
-            user.setPhoto(photoFile.getBytes());
+            if (photoFile != null && !photoFile.isEmpty()) {
+                user.setPhoto(photoFile.getBytes());
+            }
         } catch (IOException e) {
             log.error("Failed to process user photo: {}", e.getMessage());
         }
@@ -130,7 +132,9 @@ public class AuthController {
         seller.setGstNumber(gstNumber);
 
         try {
-            seller.setPhoto(photoFile.getBytes());
+            if (photoFile != null && !photoFile.isEmpty()) {
+                seller.setPhoto(photoFile.getBytes());
+            }
         } catch (IOException e) {
             log.error("Failed to process seller photo: {}", e.getMessage());
         }
