@@ -90,15 +90,34 @@ public class AuthController {
         }
 
         try {
+            log.info("Attempting to save user: {}", username);
             User savedUser = userRepo.save(user);
+            log.info("User saved with ID: {}", savedUser.getId());
+            
+            // Force flush to ensure data is persisted
+            userRepo.flush();
+            log.info("Database flush completed for user: {}", username);
+            
             log.info("User registered successfully: {} with ID: {}", username, savedUser.getId());
             log.info("User password encoded: {}", savedUser.getPassword() != null ? savedUser.getPassword().substring(0, Math.min(20, savedUser.getPassword().length())) + "..." : "null");
             
-            // Verify user was saved
+            // Verify user was saved - wait a moment for transaction to commit
+            try {
+                Thread.sleep(100); // Small delay to ensure transaction commits
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
             boolean userExists = userRepo.findByUsername(username).isPresent();
             log.info("Verification: User exists in database after save: {}", userExists);
             
-            return "redirect:/login";
+            if (!userExists) {
+                log.error("CRITICAL: User was saved but not found in database! Username: {}", username);
+                model.addAttribute("error", "Registration completed but verification failed. Please try logging in.");
+                return "signup";
+            }
+            
+            return "redirect:/login?signup=success";
         } catch (Exception e) {
             log.error("Error saving user: {}", e.getMessage(), e);
             model.addAttribute("error", "Registration failed. Please try again.");
