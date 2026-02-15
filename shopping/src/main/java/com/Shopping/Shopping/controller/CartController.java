@@ -126,11 +126,16 @@ public class CartController {
             int totalItems = cart.stream().mapToInt(CartItem::getQuantity).sum();
             logger.info("Total quantity of items in cart: {}", totalItems);
             
+            // Set success message in session
+            session.setAttribute("cartSuccessMessage", "Item added to cart successfully!");
+            
             logger.info("=== ADD TO CART REQUEST COMPLETED SUCCESSFULLY ===");
-            return "redirect:/?cartAdded=true&productName=" + product.getName().replace(" ", "+");
+            return "redirect:/?cartAdded=true";
         } catch (Exception e) {
             logger.error("=== ERROR IN ADD TO CART REQUEST for Product ID: {} ===", id, e);
-            throw e;
+            logger.error("Exception details: {}", e.getMessage(), e);
+            session.setAttribute("cartErrorMessage", "Failed to add item to cart. Please try again.");
+            return "redirect:/?cartError=true";
         }
     }
 

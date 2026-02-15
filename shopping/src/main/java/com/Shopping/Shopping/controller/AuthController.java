@@ -146,34 +146,52 @@ public class AuthController {
             @RequestParam("photo") MultipartFile photoFile,
             Model model) {
 
+        log.info("=== SELLER SIGNUP STARTED ===");
         log.info("Seller signup attempt for username: {}", username);
         
-        if (sellerRepo.findByUsername(username).isPresent()) {
-            log.warn("Seller signup failed - username already exists: {}", username);
-            model.addAttribute("error", "Username already exists!");
-            model.addAttribute("seller", new Seller());
-            return "seller-signup";
-        }
-
-        Seller seller = new Seller();
-        seller.setUsername(username);
-        seller.setPassword(passwordEncoder.encode(password));
-        seller.setEmail(email);
-        seller.setWhatsappNumber(whatsappNumber);
-        seller.setBusinessEmail(businessEmail);
-        seller.setGstNumber(gstNumber);
-
         try {
-            if (photoFile != null && !photoFile.isEmpty()) {
-                seller.setPhoto(photoFile.getBytes());
+            // Check if username already exists
+            if (sellerRepo.findByUsername(username).isPresent()) {
+                log.warn("Seller signup failed - username already exists: {}", username);
+                model.addAttribute("error", "Username already exists!");
+                model.addAttribute("seller", new Seller());
+                return "seller-signup";
             }
-        } catch (IOException e) {
-            log.error("Failed to process seller photo: {}", e.getMessage());
-        }
 
-        try {
-            log.info("Attempting to save seller: {}", username);
-            // Use saveAndFlush to ensure immediate persistence
+            // Validate password
+            if (!isValidPassword(password)) {
+                log.warn("Seller signup failed - invalid password for username: {}", username);
+                model.addAttribute("error", "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, digit, and special character.");
+                model.addAttribute("seller", new Seller());
+                return "seller-signup";
+            }
+
+            log.info("Creating seller object for username: {}", username);
+            Seller seller = new Seller();
+            seller.setUsername(username);
+            seller.setPassword(passwordEncoder.encode(password));
+            seller.setEmail(email);
+            seller.setWhatsappNumber(whatsappNumber);
+            seller.setBusinessEmail(businessEmail);
+            seller.setGstNumber(gstNumber);
+            log.info("Seller object created successfully");
+
+            // Handle photo upload
+            try {
+                if (photoFile != null && !photoFile.isEmpty()) {
+                    log.info("Processing seller photo for username: {}", username);
+                    seller.setPhoto(photoFile.getBytes());
+                    log.info("Seller photo processed successfully");
+                } else {
+                    log.info("No photo provided for seller: {}", username);
+                }
+            } catch (IOException e) {
+                log.error("Failed to process seller photo: {}", e.getMessage(), e);
+                // Continue without photo - it's optional
+            }
+
+            // Save seller to database
+            log.info("Attempting to save seller to database: {}", username);
             Seller savedSeller = sellerRepo.saveAndFlush(seller);
             log.info("Seller saved and flushed with ID: {}", savedSeller.getId());
             
@@ -196,11 +214,19 @@ public class AuthController {
                 log.error("❌ VERIFICATION FAILED: Seller NOT found by username in database - Username: {}", username);
             }
             
+            log.info("=== SELLER SIGNUP COMPLETED SUCCESSFULLY ===");
             log.info("Seller registered successfully: {}", username);
             return "redirect:/seller-login";
+            
         } catch (Exception e) {
-            log.error("Error saving seller: {}", e.getMessage(), e);
-            model.addAttribute("error", "Registration failed. Please try again.");
+            log.error("=== SELLER SIGNUP FAILED ===");
+            log.error("Error during seller signup for username: {}", username, e);
+            log.error("Exception type: {}", e.getClass().getName());
+            log.error("Exception message: {}", e.getMessage());
+            if (e.getCause() != null) {
+                log.error("Root cause: {}", e.getCause().getMessage());
+            }
+            model.addAttribute("error", "Registration failed: " + e.getMessage() + ". Please try again.");
             model.addAttribute("seller", new Seller());
             return "seller-signup";
         }

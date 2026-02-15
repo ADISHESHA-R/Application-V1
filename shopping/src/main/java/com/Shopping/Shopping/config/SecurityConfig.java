@@ -2,6 +2,7 @@ package com.Shopping.Shopping.config;
 
 import com.Shopping.Shopping.service.UserDetailsServiceImpl;
 import com.Shopping.Shopping.service.SellerDetailsService;
+import com.Shopping.Shopping.service.AdminDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,13 +19,16 @@ public class SecurityConfig {
     private final CustomLoginSuccessHandler successHandler;
     private final UserDetailsServiceImpl userDetailsService;
     private final SellerDetailsService sellerDetailsService;
+    private final AdminDetailsService adminDetailsService;
 
     public SecurityConfig(CustomLoginSuccessHandler successHandler,
                           UserDetailsServiceImpl userDetailsService,
-                          SellerDetailsService sellerDetailsService) {
+                          SellerDetailsService sellerDetailsService,
+                          AdminDetailsService adminDetailsService) {
         this.successHandler = successHandler;
         this.userDetailsService = userDetailsService;
         this.sellerDetailsService = sellerDetailsService;
+        this.adminDetailsService = adminDetailsService;
     }
 
     @Bean
@@ -46,6 +50,52 @@ public class SecurityConfig {
         provider.setUserDetailsService(sellerDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
+    }
+
+    @Bean
+    public DaoAuthenticationProvider adminAuthProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(adminDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    /**
+     * ✅ Admin Security Configuration (Highest Priority)
+     */
+    @Bean
+    @Order(0)
+    public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/admin-login", "/admin-logout", "/admin/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin-login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/admin-login")
+                        .loginProcessingUrl("/admin-login")
+                        .defaultSuccessUrl("/admin", true)
+                        .failureUrl("/admin-login?error")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/admin-logout")
+                        .logoutSuccessUrl("/admin-login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/access-denied")
+                )
+                .authenticationProvider(adminAuthProvider(passwordEncoder()))
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                );
+
+        return http.build();
     }
 
     /**
@@ -97,7 +147,8 @@ public class SecurityConfig {
     public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/product/**", "/product-image/**", "/signup", "/login", "/seller-login", "/seller-signup", "/oauth2/**", "/h2-console/**", "/uploads/**", "/css/**", "/js/**", "/images/**", "/admin/**").permitAll()
+                        .requestMatchers("/", "/product/**", "/product-image/**", "/signup", "/login", "/seller-login", "/seller-signup", "/oauth2/**", "/h2-console/**", "/uploads/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        // /admin/** removed from permitAll() - now secured by adminFilterChain
                         .requestMatchers("/search").permitAll() // Allow search for everyone
                         .requestMatchers("/cart/add/**", "/cart/remove/**", "/cart/update/**", "/cart").permitAll() // Allow cart operations for everyone
                         .requestMatchers("/help-center", "/contact-us", "/privacy-policy", "/terms-of-service").permitAll() // Allow public access to info pages

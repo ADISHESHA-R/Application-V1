@@ -14,6 +14,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -109,5 +114,128 @@ public class AdminController {
         model.addAttribute("products", products);
         model.addAttribute("productCount", products.size());
         return "admin-products";
+    }
+
+    // ========== DELETE OPERATIONS ==========
+
+    @PostMapping("/admin/users/delete/{id}")
+    @Transactional
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userRepository.deleteById(id);
+            log.info("User deleted successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
+        } catch (Exception e) {
+            log.error("Error deleting user: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete user: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/sellers/delete/{id}")
+    @Transactional
+    public String deleteSeller(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            sellerRepository.deleteById(id);
+            log.info("Seller deleted successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "Seller deleted successfully!");
+        } catch (Exception e) {
+            log.error("Error deleting seller: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete seller: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/products/delete/{id}")
+    @Transactional
+    public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            productRepository.deleteById(id);
+            log.info("Product deleted successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "Product deleted successfully!");
+        } catch (Exception e) {
+            log.error("Error deleting product: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete product: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    // ========== UPDATE OPERATIONS ==========
+
+    @PostMapping("/admin/users/update/{id}")
+    @Transactional
+    public String updateUser(@PathVariable Long id,
+                            @RequestParam("username") String username,
+                            @RequestParam("phoneNumber") String phoneNumber,
+                            @RequestParam("alternateNumber") String alternateNumber,
+                            @RequestParam("address") String address,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            user.setUsername(username);
+            user.setPhoneNumber(phoneNumber);
+            user.setAlternateNumber(alternateNumber);
+            user.setAddress(address);
+            userRepository.saveAndFlush(user);
+            log.info("User updated successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "User updated successfully!");
+        } catch (Exception e) {
+            log.error("Error updating user: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to update user: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/sellers/update/{id}")
+    @Transactional
+    public String updateSeller(@PathVariable Long id,
+                              @RequestParam("username") String username,
+                              @RequestParam("email") String email,
+                              @RequestParam("whatsappNumber") String whatsappNumber,
+                              @RequestParam("businessEmail") String businessEmail,
+                              @RequestParam("gstNumber") String gstNumber,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            Seller seller = sellerRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Seller not found"));
+            seller.setUsername(username);
+            seller.setEmail(email);
+            seller.setWhatsappNumber(whatsappNumber);
+            seller.setBusinessEmail(businessEmail);
+            seller.setGstNumber(gstNumber);
+            sellerRepository.saveAndFlush(seller);
+            log.info("Seller updated successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "Seller updated successfully!");
+        } catch (Exception e) {
+            log.error("Error updating seller: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to update seller: " + e.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/products/update/{id}")
+    @Transactional
+    public String updateProduct(@PathVariable Long id,
+                               @RequestParam("name") String name,
+                               @RequestParam("description") String description,
+                               @RequestParam("price") double price,
+                               @RequestParam("category") String category,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setCategory(category);
+            productRepository.saveAndFlush(product);
+            log.info("Product updated successfully: ID {}", id);
+            redirectAttributes.addFlashAttribute("success", "Product updated successfully!");
+        } catch (Exception e) {
+            log.error("Error updating product: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Failed to update product: " + e.getMessage());
+        }
+        return "redirect:/admin";
     }
 }
