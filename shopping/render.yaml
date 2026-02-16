@@ -8,26 +8,26 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: CORS_ALLOWED_ORIGINS
-        value: https://your-react-app.vercel.app,https://your-react-app.onrender.com
+        value: http://localhost:3000,http://localhost:5173,https://your-react-app.vercel.app
       - key: JWT_SECRET
-        sync: false  # Set this in Render dashboard
+        sync: false  # Generate a strong secret - use: openssl rand -base64 32
       - key: RAZORPAY_KEY
-        sync: false  # Set this in Render dashboard
+        value: rzp_test_E1v7jL3XBuxjg0
       - key: RAZORPAY_SECRET
-        sync: false  # Set this in Render dashboard
+        value: CwvaDEvYSfJuP40WfrpyrxpH
       - key: ADMIN_USERNAME
         value: admin
       - key: ADMIN_PASSWORD
-        sync: false  # Set this in Render dashboard
+        value: ADI@28adi
       - key: GOOGLE_CLIENT_ID
         sync: false  # Set this in Render dashboard (optional)
       - key: GOOGLE_CLIENT_SECRET
         sync: false  # Set this in Render dashboard (optional)
       - key: GITHUB_CLIENT_ID
-        value: Ov23liCogGkwyc6V02jL
+        value: Ov231iCogGkwyc6V02jL
       - key: GITHUB_CLIENT_SECRET
         sync: false  # Set this in Render dashboard (optional)
       - key: DATABASE_URL
         fromDatabase:
-          name: shopping-api-db
+          name: shopping-db
           property: connectionString
