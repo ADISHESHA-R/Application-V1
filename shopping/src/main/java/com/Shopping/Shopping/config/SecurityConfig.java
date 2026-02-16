@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
@@ -183,6 +184,27 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/h2-console/**", "/seller-signup")
                 )
                 .headers(headers -> headers.frameOptions().disable());
+
+        return http.build();
+    }
+
+    /**
+     * ✅ API Security Configuration (Lowest Priority - handles /api/** routes)
+     */
+    @Bean
+    @Order(3)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+        http
+            .securityMatcher("/api/**")
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/v1/products/**", "/api/v1/auth/**", "/api/v1/seller/signup").permitAll()
+                .requestMatchers("/api/v1/user/**", "/api/v1/cart/**", "/api/v1/payment/**").hasRole("USER")
+                .requestMatchers("/api/v1/seller/**").hasRole("SELLER")
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
     }
