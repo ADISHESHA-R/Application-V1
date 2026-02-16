@@ -7,16 +7,21 @@ import com.Shopping.Shopping.model.Product;
 import com.Shopping.Shopping.model.Seller;
 import com.Shopping.Shopping.repository.ProductRepository;
 import com.Shopping.Shopping.repository.SellerRepository;
+import com.Shopping.Shopping.security.JwtTokenProvider;
 import com.Shopping.Shopping.service.ProductService;
+import com.Shopping.Shopping.service.SellerDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,20 +35,75 @@ public class ApiSellerController {
     private final ProductRepository productRepository;
     private final ProductService productService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
+    private final SellerDetailsService sellerDetailsService;
 
     public ApiSellerController(SellerRepository sellerRepository,
                                ProductRepository productRepository,
                                ProductService productService,
-                               PasswordEncoder passwordEncoder) {
+                               PasswordEncoder passwordEncoder,
+                               JwtTokenProvider tokenProvider,
+                               SellerDetailsService sellerDetailsService) {
         this.sellerRepository = sellerRepository;
         this.productRepository = productRepository;
         this.productService = productService;
         this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
+        this.sellerDetailsService = sellerDetailsService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginRequest request) {
+        try {
+            // Load seller details directly (avoiding AuthenticationManager loop)
+            UserDetails userDetails = sellerDetailsService.loadUserByUsername(request.getUsername());
+            
+            // Verify password
+            if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Invalid username or password"));
+            }
+
+            // Generate token
+            String token = tokenProvider.generateToken(userDetails);
+
+            Optional<Seller> sellerOpt = sellerRepository.findByUsername(request.getUsername());
+            SellerDTO sellerDTO = sellerOpt.map(this::convertToDTO).orElse(null);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("type", "Bearer");
+            response.put("seller", sellerDTO);
+
+            return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Invalid username or password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Invalid username or password"));
+        }
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<SellerDTO>> signup(@ModelAttribute SellerSignupRequest request) {
+    public ResponseEntity<ApiResponse<SellerDTO>> signup(@RequestBody SellerSignupRequest request) {
         try {
+            // Validate required fields
+            if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Username is required"));
+            }
+
+            if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Password is required"));
+            }
+
+            if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Email is required"));
+            }
+
             if (sellerRepository.findByUsername(request.getUsername()).isPresent()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Username already exists"));
@@ -62,8 +122,16 @@ public class ApiSellerController {
             seller.setBusinessEmail(request.getBusinessEmail());
             seller.setGstNumber(request.getGstNumber());
 
-            if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
-                seller.setPhoto(request.getPhoto().getBytes());
+            // Photo handling - if provided as base64 (for JSON requests)
+            if (request.getPhotoBase64() != null && !request.getPhotoBase64().trim().isEmpty()) {
+                // Handle base64 photo if provided
+                try {
+                    byte[] photoBytes = java.util.Base64.getDecoder().decode(request.getPhotoBase64());
+                    seller.setPhoto(photoBytes);
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("Invalid photo format. Please provide a valid base64 encoded image."));
+                }
             }
 
             Seller savedSeller = sellerRepository.saveAndFlush(seller);
@@ -233,6 +301,9 @@ public class ApiSellerController {
     }
 
     private boolean isValidPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            return false;
+        }
         return password.length() >= 8 &&
             password.matches(".*[A-Z].*") &&
             password.matches(".*[a-z].*") &&
@@ -248,7 +319,7 @@ public class ApiSellerController {
         private String whatsappNumber;
         private String businessEmail;
         private String gstNumber;
-        private MultipartFile photo;
+        private String photoBase64; // For JSON base64 encoded images (optional)
     }
 
     @lombok.Data
@@ -267,5 +338,11 @@ public class ApiSellerController {
         private String productCategory;
         private String uniqueProductId;
         private MultipartFile productImage;
+    }
+
+    @lombok.Data
+    static class LoginRequest {
+        private String username;
+        private String password;
     }
 }

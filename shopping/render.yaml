@@ -7,6 +7,10 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://your-react-app.vercel.app,https://your-react-app.onrender.com
+      - key: JWT_SECRET
+        sync: false  # Set this in Render dashboard
       - key: RAZORPAY_KEY
         sync: false  # Set this in Render dashboard
       - key: RAZORPAY_SECRET
@@ -25,11 +29,5 @@ services:
         sync: false  # Set this in Render dashboard (optional)
       - key: DATABASE_URL
         fromDatabase:
-          name: shopping-db
+          name: shopping-api-db
           property: connectionString
-
-databases:
-  - name: shopping-db
-    plan: free
-    databaseName: shopping_db
-    user: shopping_user

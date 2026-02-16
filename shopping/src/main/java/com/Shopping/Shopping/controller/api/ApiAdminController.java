@@ -10,12 +10,19 @@ import com.Shopping.Shopping.model.User;
 import com.Shopping.Shopping.repository.ProductRepository;
 import com.Shopping.Shopping.repository.SellerRepository;
 import com.Shopping.Shopping.repository.UserRepository;
+import com.Shopping.Shopping.security.JwtTokenProvider;
+import com.Shopping.Shopping.service.AdminDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,13 +33,53 @@ public class ApiAdminController {
     private final UserRepository userRepository;
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
+    private final JwtTokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final AdminDetailsService adminDetailsService;
 
     public ApiAdminController(UserRepository userRepository,
                              SellerRepository sellerRepository,
-                             ProductRepository productRepository) {
+                             ProductRepository productRepository,
+                             JwtTokenProvider tokenProvider,
+                             PasswordEncoder passwordEncoder,
+                             AdminDetailsService adminDetailsService) {
         this.userRepository = userRepository;
         this.sellerRepository = sellerRepository;
         this.productRepository = productRepository;
+        this.tokenProvider = tokenProvider;
+        this.passwordEncoder = passwordEncoder;
+        this.adminDetailsService = adminDetailsService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginRequest request) {
+        try {
+            // Load admin details directly (avoiding AuthenticationManager loop)
+            UserDetails userDetails = adminDetailsService.loadUserByUsername(request.getUsername());
+            
+            // Verify password
+            if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Invalid username or password"));
+            }
+
+            // Generate token
+            String token = tokenProvider.generateToken(userDetails);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("type", "Bearer");
+            response.put("username", userDetails.getUsername());
+            response.put("roles", userDetails.getAuthorities());
+
+            return ResponseEntity.ok(ApiResponse.success("Login successful", response));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Invalid username or password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Invalid username or password"));
+        }
     }
 
     @GetMapping("/users")
@@ -236,5 +283,11 @@ public class ApiAdminController {
         private double price;
         private String category;
         private String uniqueProductId;
+    }
+
+    @lombok.Data
+    static class LoginRequest {
+        private String username;
+        private String password;
     }
 }
